@@ -48,11 +48,18 @@ def mark_value(value):
         return value
 
 def handle_banner(driver):
-    close_buttons = driver.find_elements(By.XPATH, "//button[text()='Close' or text()='I got it']")
+    close_buttons = driver.find_elements(By.XPATH, "//button[text()='Close']")
     # Check if any buttons were found
-    if close_buttons:
+    if len(close_buttons) > 0:
         # Loop through each button and click it
         for button in close_buttons:
+            button.click()
+            
+    i_got_it_buttons = driver.find_elements(By.XPATH, "//button[text()= 'I got it']")
+    # Check if any buttons were found
+    if len(i_got_it_buttons) > 0:
+        # Loop through each button and click it
+        for button in i_got_it_buttons:
             button.click()
     
 # Setup logging configuration
