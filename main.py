@@ -54,7 +54,7 @@ def handle_banner(driver):
         # Loop through each button and click it
         for button in close_buttons:
             button.click()
-            
+    show_loading_animation(random.randint(2, 4))
     i_got_it_buttons = driver.find_elements(By.XPATH, "//button[text()= 'I got it']")
     # Check if any buttons were found
     if len(i_got_it_buttons) > 0:
@@ -239,7 +239,7 @@ def main():
             driver.refresh()
         logging.info("Login Extension Success...")
         
-        show_loading_animation(random.randint(5, 10))
+        show_loading_animation(random.randint(3, 5))
         handle_banner(driver)
         # Get handles for all windows
         all_windows = driver.window_handles
