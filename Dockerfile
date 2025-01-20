@@ -1,6 +1,6 @@
 
-ARG EXTENSION_ID='jlpniknnodfkbmbgkjelcailjljlecch'
-ARG WEB_URL='https://sparkchain.ai/dashboard'
+ARG EXTENSION_ID='caacbgbklghmpodbdafajbgdnegacfmo'
+ARG WEB_URL='https://app.gradient.network/dashboard'
 ARG VERSION
 FROM debian:11-slim AS base 
 

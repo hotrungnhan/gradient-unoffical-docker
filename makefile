@@ -1,8 +1,8 @@
-export EXTENSION_ID=jlpniknnodfkbmbgkjelcailjljlecch
-export WEB_URL=https://sparkchain.ai/dashboard
+export EXTENSION_ID=caacbgbklghmpodbdafajbgdnegacfmo
+export WEB_URL=https://app.gradient.network/dashboard
 export GIT_USERNAME=sryze
 export GIT_REPO=crx-dl
-export PUBLIC_CONTAINER_PATH=hotrungnhan/spark-chain
+export PUBLIC_CONTAINER_PATH=hotrungnhan/gradient-sentry:latest
 
 build: 
 	docker buildx build --build-arg VERSION=${version} -t $(PUBLIC_CONTAINER_PATH):${version} -t $(PUBLIC_CONTAINER_PATH):latest --push .

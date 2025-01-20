@@ -14,11 +14,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+previous_connection_status = None
+
 def mark_value(value):
     # If the value is a dictionary, recursively mark its values
     if isinstance(value, dict):
         return {key: mark_value(val) for key, val in value.items()}
-
+        
     # If the value is a list, recursively mark each item in the list
     elif isinstance(value, list):
         return [mark_value(item) for item in value]
@@ -45,7 +47,14 @@ def mark_value(value):
     else:
         return value
 
-
+def handle_banner(driver):
+    close_buttons = driver.find_elements(By.XPATH, "//button[text()='Close' or text()='I got it']")
+    # Check if any buttons were found
+    if close_buttons:
+        # Loop through each button and click it
+        for button in close_buttons:
+            button.click()
+    
 # Setup logging configuration
 def setup_logging():
     logging.basicConfig(
@@ -64,11 +73,15 @@ def show_loading_animation(duration):
 
 # Check connection status
 def check_connection_status(driver):
-    if wait_for_element_exists(driver, By.XPATH, "//*[text()='Spark is Connected']"):
+    global previous_connection_status
+    if wait_for_element_exists(driver, By.XPATH, "//*[text()='Good']"):
         logging.info("Status: Connected!")
-    elif wait_for_element_exists(driver, By.XPATH, "//*[text()='Connect Spark']"):
+        previous_connection_status = "Connected"
+    elif wait_for_element_exists(driver, By.XPATH, "//*[text()='Disconnected']"):
         logging.warning("Status: Disconnected!")
+        previous_connection_status = "Disconnected"
     else:
+        previous_connection_status = "Unknown"
         logging.warning("Status: Unknown!")
 
 
@@ -172,12 +185,12 @@ def main():
     try:
         # logins
         driver.set_window_size(1024, driver.get_window_size()["height"])
-        logging.info("Accessing spark dashboard page...")
+        logging.info("Accessing gradient dashboard page...")
         driver.get(web_url)
 
         show_loading_animation(random.randint(1, 3))
 
-        while not wait_for_element_exists(driver, By.XPATH, "//*[text()='Register']"):
+        while not wait_for_element_exists(driver, By.XPATH, "//*[text()='Forgot Password']"):
             show_loading_animation(random.randint(1, 3))
 
         logging.info("Login...")
@@ -186,22 +199,22 @@ def main():
 
         logging.info(f"Entering email: {mark_value(email)}")
         email_em = driver.find_element(
-            By.XPATH, "//input[contains(@placeholder,'Email')]"
+            By.XPATH, "//input[contains(@placeholder,'Enter Email')]"
         )
 
         email_em.send_keys(email)
         
         logging.info(f"Entering email: {mark_value(password)}")
         passworld_em = driver.find_element(
-            By.XPATH, "//input[contains(@placeholder,'Password')]"
+            By.XPATH, "//input[contains(@placeholder,'Enter Password')]"
         )
         passworld_em.send_keys(password)
 
         logging.info("Clicking the login button...")
-        login_em = driver.find_element(By.XPATH, "//button[text()='Login']")
+        login_em = driver.find_element(By.XPATH, "//button[text()='Log In']")
         login_em.click()
 
-        while not wait_for_element_exists(driver, By.XPATH, "//*[text()='Dashboard']"):
+        while not wait_for_element_exists(driver, By.XPATH, "//*[text()='Node Status']"):
             show_loading_animation(random.randint(1, 3))
 
         show_loading_animation(random.randint(1, 3))
@@ -212,12 +225,15 @@ def main():
         driver.refresh()
 
         while not wait_for_element_exists(
-            driver, By.XPATH, "//*[text()='Epoch Earnings:']"
+            driver, By.XPATH, "//*[text()='Status']"
         ):
             logging.info("Refreshing extension page...")
             show_loading_animation(random.randint(1, 3))
             driver.refresh()
         logging.info("Login Extension Success...")
+        
+        show_loading_animation(random.randint(5, 10))
+        handle_banner(driver)
         # Get handles for all windows
         all_windows = driver.window_handles
 
@@ -243,7 +259,8 @@ def main():
 
     while True:
         try:
-            time.sleep(3600)
+            logging.info(f"Refresh in {60 if previous_connection_status in ["Disconnected", None] else 3600} seconds")
+            time.sleep(60 if previous_connection_status in ["Disconnected", None] else 3600)
             driver.refresh()
             check_connection_status(driver)
         except KeyboardInterrupt:
